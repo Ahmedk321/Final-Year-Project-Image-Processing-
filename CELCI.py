@@ -770,3 +770,61 @@ select= Button(root,text="Traditional Contrast Enhancement",bg="black",fg="white
 select1= Button(root,text='''Contrast Enhancement using DWT
 (Proposed Method)''',font="Helvetica 12 bold",bg="black",fg="white",command=page3).pack(pady=10)
 root.mainloop()
+
+
+
+
+
+
+
+# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+
+# Extract the faces from the first frame in vid_real_faces
+first_frame_faces_real = vid_real_faces[0]['faces']
+
+# Create subplots based on the number of detected faces
+num_faces = len(first_frame_faces_real)
+fig, axes = plt.subplots(1, num_faces, figsize=(12, 4))
+
+# If only one face, convert axes to a list to ensure compatibility
+if num_faces == 1:
+    axes = [axes]
+
+# Loop over the faces and display them
+for i in range(num_faces):
+    # Display each face
+    axes[i].imshow(first_frame_faces_real[i])
+    axes[i].set_title('Face {}'.format(i+1))
+
+# Adjust subplot spacing and display the plot
+plt.tight_layout()
+plt.show()
+
+# Extract the faces from the first frame in vid_real_faces
+first_frame_faces_real = vid_real_faces[0]['faces']
+
+# Prepare the faces for inference
+faces_real_t = torch.stack([transf(image=face)['image'] for face in first_frame_faces_real])
+
+# Pass the faces through the model to get the confidence scores
+with torch.no_grad():
+    faces_real_pred = net(faces_real_t.to(device)).cpu().numpy().flatten()
+
+# # Display the confidence scores
+# for i, confidence_score in enumerate(faces_real_pred):
+#     print(f"Face {i+1} confidence score: {confidence_score}")
+
+
+
+
+
+
+
+
+# Calculate the average score for each face
+average_scores = [expit(face_scores.mean()) for face_scores in faces_real_t]
+
+# Display the average scores for each face
+for i, average_score in enumerate(average_scores):
+    print(f"Average score for Face {i+1}: {average_score:.4f}")
